@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { GridElement } from '../models/grid-element';
+import { Connection } from '../models/connection';
 import { Topology } from '../models/topology';
 
 @Injectable({
@@ -36,5 +37,10 @@ export class Grid {
   // Mettre à jour le statut d'un élément (En service / Hors service).
   updateStatus(id: number, status: string): Observable<GridElement> {
     return this.http.put<GridElement>(`${this.apiUrl}/${id}/status`, { status });
+  }
+
+  // Créer une liaison (la puissance circule de fromId vers toId).
+  addConnection(fromId: number, toId: number): Observable<Connection> {
+    return this.http.post<Connection>(`${this.apiBase}/connections`, { fromId, toId });
   }
 }

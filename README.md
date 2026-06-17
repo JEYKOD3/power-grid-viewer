@@ -1,2 +1,120 @@
-# power-grid-viewer
-Mini SPA Angular connectée à une ASP.NET Core minimal API pour gérer des élément d'un réseau électrique. 
+# Power Grid Viewer
+
+A mini "city" power-grid viewer inspired by distribution-network tools like CYME, built at a small scale for demo purposes. An Angular single-page app talks to an ASP.NET Core minimal API to manage power-grid elements and visualize how electricity propagates across a city on an interactive map.
+
+> The user interface is in French (e.g. _Réseau électrique_, _Carte_, _Ajouter_).
+
+## Features
+
+- **Interactive grid map** (`/map`) — a hand-built SVG of a radial distribution network (generator → transformers → breakers → city zones). Click any element to switch it **En service / Hors service** and watch energization propagate live: powered zones turn green, de-energized ones turn red.
+- **Energization engine** — a pure, testable BFS that starts from in-service generators and only flows through in-service elements, so an out-of-service transformer or breaker blocks everything downstream.
+- **Element list** (`/elements`) — tabular view of all grid elements with filtering by type.
+- **Element detail** (`/elements/:id`) — properties of a single element.
+- **Add element** (`/add`) — reactive form to create a new element.
+- **Backup generator demo** — `G-Secours` starts out of service feeding an isolated zone; turning it on re-energizes that island.
+
+## Tech stack
+
+| Layer    | Technology                                                                 |
+| -------- | ------------------------------------------------------------------------- |
+| Frontend | Angular 21 (standalone components, signals, zoneless change detection)     |
+| Backend  | ASP.NET Core minimal API (.NET 10, C#)                                     |
+| Tests    | Vitest (frontend), xUnit + `WebApplicationFactory` (API)                   |
+| Tooling  | Prettier, GitHub Actions CI                                                |
+
+## Project structure
+
+```
+power-grid-viewer/
+├─ .github/workflows/ci.yml          # CI: frontend (format/test/build) + API (build/test)
+├─ README.md
+└─ PowerGridApi/                      # ASP.NET Core minimal API
+   ├─ Program.cs                      # Endpoints + seeded topology (elements/connections/zones)
+   ├─ Properties/launchSettings.json  # API runs on http://localhost:5050
+   ├─ PowerGridApi.Tests/             # xUnit integration tests
+   │  └─ ApiEndpointsTests.cs
+   └─ power-grid-viewer/              # Angular SPA
+      └─ src/app/
+         ├─ app.routes.ts            # /map (default), /elements, /elements/:id, /add
+         ├─ models/                  # grid-element, connection, zone, topology
+         ├─ services/grid.ts         # HTTP client (apiBase http://localhost:5050/api)
+         └─ components/
+            ├─ grid-map/             # SVG map + energization.ts (pure BFS) + tests
+            ├─ element-list/
+            ├─ element-detail/
+            └─ add-element/
+```
+
+## Data model
+
+- **GridElement** — `{ id, name, type, tensionKv, status, x, y }`. `type` is one of `Générateur`, `Transformateur`, `Disjoncteur`, `Charge`; `status` is `En service` or `Hors service`; `x`/`y` are map coordinates.
+- **Connection** — `{ id, fromId, toId }`, a directed link along which power flows.
+- **Zone** — `{ id, name, category, x, y, sourceElementId }`, a city zone powered by `sourceElementId`.
+- **Topology** — `{ elements, connections, zones }`, returned in one call for the map.
+
+A zone is powered when its source element is energized; energization is computed client-side by `computeEnergized()` (BFS from in-service generators through in-service elements).
+
+## API endpoints
+
+| Method | Route                       | Description                                          |
+| ------ | --------------------------- | ---------------------------------------------------- |
+| GET    | `/api/topology`             | Full network: `{ elements, connections, zones }`     |
+| GET    | `/api/elements`             | List all elements                                    |
+| GET    | `/api/elements/{id}`        | Single element (404 if missing)                      |
+| POST   | `/api/elements`             | Create an element (server assigns the id)            |
+| PUT    | `/api/elements/{id}/status` | Update an element's status, body `{ "status": ... }` |
+
+CORS is open (any origin/method/header) for local development.
+
+## Getting started
+
+### Prerequisites
+
+- [.NET SDK 10.0](https://dotnet.microsoft.com/)
+- [Node.js 22+](https://nodejs.org/) and npm
+
+### 1. Run the API (terminal 1)
+
+```bash
+cd PowerGridApi
+dotnet run        # or: dotnet watch run
+```
+
+The API listens on `http://localhost:5050`.
+
+### 2. Run the frontend (terminal 2)
+
+```bash
+cd PowerGridApi/power-grid-viewer
+npm install
+npm start         # ng serve
+```
+
+Open `http://localhost:4200/` and you'll land on the **Carte** (map) view.
+
+> If the map is empty, make sure the API is running on port 5050 (the frontend's `apiBase` points there).
+
+## Testing
+
+**Frontend** (from `PowerGridApi/power-grid-viewer`):
+
+```bash
+npm test                 # unit tests (Vitest)
+npm run build            # production build
+npm run format:check     # Prettier formatting check
+```
+
+**API** (from `PowerGridApi`):
+
+```bash
+dotnet test PowerGridApi.Tests/PowerGridApi.Tests.csproj
+```
+
+> Tip: avoid running `dotnet test`/`dotnet build` against the project while `dotnet watch run` is serving it — it can mark the running project "stale" (`ENC1008`) and keep the old in-memory data until restarted.
+
+## Continuous integration
+
+`.github/workflows/ci.yml` runs on every push and pull request:
+
+- **Frontend** job: `npm ci`, `npm run format:check`, `npm test`, `npm run build`.
+- **API** job: `dotnet restore`, `dotnet build` (Release), `dotnet test`.

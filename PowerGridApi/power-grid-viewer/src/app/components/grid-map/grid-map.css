@@ -16,16 +16,29 @@
   display: block;
 }
 
+/* Fond de carte */
+.map-bg {
+  fill: #eef5ee;
+}
+
+.map-halo {
+  fill: none;
+  stroke: #d6e6d6;
+  stroke-width: 2;
+  stroke-dasharray: 4 8;
+}
+
 /* Liaisons réseau */
 .connection,
 .feeder {
   stroke: #cbd5e1;
-  stroke-width: 4;
+  stroke-width: 2.5;
+  stroke-linecap: round;
 }
 
 .feeder {
-  stroke-dasharray: 6 6;
-  stroke-width: 3;
+  stroke-dasharray: 5 6;
+  stroke-width: 2;
 }
 
 .connection.live,
@@ -34,14 +47,14 @@
 }
 
 .connection.live {
-  stroke-width: 5;
+  stroke-width: 3.5;
 }
 
 /* Zones */
 .zone {
   fill: #fee2e2;
   stroke: #ef4444;
-  stroke-width: 2;
+  stroke-width: 1.5;
   transition:
     fill 0.2s ease,
     stroke 0.2s ease;
@@ -53,18 +66,18 @@
 }
 
 .zone-name {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   fill: #1f2937;
 }
 
 .zone-category {
-  font-size: 10px;
+  font-size: 9px;
   fill: #6b7280;
 }
 
 .zone-status {
-  font-size: 13px;
+  font-size: 12px;
 }
 
 /* Éléments */
@@ -82,16 +95,30 @@
   stroke-width: 3;
 }
 
-.element-name {
-  font-size: 12px;
-  font-weight: 700;
-  fill: #ffffff;
-  pointer-events: none;
+/* Générateurs: rond plutôt que rectangle */
+.generator-node {
+  display: none;
+  stroke: #1f2937;
+  stroke-width: 2;
+  transition: fill 0.2s ease;
 }
 
-.element-type {
-  font-size: 9px;
-  fill: #f1f5f9;
+.element.generator .generator-node {
+  display: block;
+}
+
+.element.generator .element-box {
+  display: none;
+}
+
+.element.generator:hover .generator-node {
+  stroke-width: 3.5;
+}
+
+.element-name {
+  font-size: 11px;
+  font-weight: 700;
+  fill: #ffffff;
   pointer-events: none;
 }
 

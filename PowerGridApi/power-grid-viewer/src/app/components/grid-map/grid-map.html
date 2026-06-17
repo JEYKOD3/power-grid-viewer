@@ -1,11 +1,15 @@
 <h2>Carte du réseau électrique</h2>
 <p class="hint">
   Cliquez sur un élément du réseau pour le mettre en/hors service et observer la propagation de
-  l'alimentation.
+  l'alimentation. Astuce: activez <strong>G-Secours</strong> pour réalimenter la Zone-Insulaire.
 </p>
 
 <div class="map-wrapper">
-  <svg viewBox="0 0 900 540" preserveAspectRatio="xMidYMid meet" class="grid-svg">
+  <svg viewBox="0 0 1160 770" preserveAspectRatio="xMidYMid meet" class="grid-svg">
+    <!-- Fond de carte -->
+    <rect x="0" y="0" width="1160" height="770" class="map-bg" />
+    <circle cx="560" cy="380" r="300" class="map-halo" />
+
     <!-- Liaisons entre éléments du réseau -->
     <g class="connections">
       <line
@@ -37,16 +41,16 @@
       <g *ngFor="let z of zoneViews()" [attr.transform]="'translate(' + z.x + ',' + z.y + ')'">
         <rect
           x="0"
-          y="-26"
-          width="160"
-          height="52"
+          y="-22"
+          width="124"
+          height="44"
           rx="6"
           class="zone"
           [class.powered]="z.powered"
         />
-        <text x="80" y="-6" text-anchor="middle" class="zone-name">{{ z.name }}</text>
-        <text x="80" y="12" text-anchor="middle" class="zone-category">{{ z.category }}</text>
-        <text x="148" y="-12" text-anchor="end" class="zone-status">
+        <text x="62" y="-4" text-anchor="middle" class="zone-name">{{ z.name }}</text>
+        <text x="62" y="11" text-anchor="middle" class="zone-category">{{ z.category }}</text>
+        <text x="114" y="-9" text-anchor="end" class="zone-status">
           {{ z.powered ? '⚡' : '✕' }}
         </text>
       </g>
@@ -58,19 +62,20 @@
         *ngFor="let el of elements()"
         [attr.transform]="'translate(' + (el.x ?? 0) + ',' + (el.y ?? 0) + ')'"
         class="element"
+        [class.generator]="el.type === 'Générateur'"
         (click)="toggle(el)"
       >
+        <circle r="26" [attr.fill]="elementFill(el)" class="element-node generator-node" />
         <rect
-          x="-46"
-          y="-22"
-          width="92"
-          height="44"
+          x="-42"
+          y="-17"
+          width="84"
+          height="34"
           rx="8"
           [attr.fill]="elementFill(el)"
           class="element-box"
         />
-        <text x="0" y="-3" text-anchor="middle" class="element-name">{{ el.name }}</text>
-        <text x="0" y="13" text-anchor="middle" class="element-type">{{ el.type }}</text>
+        <text x="0" y="4" text-anchor="middle" class="element-name">{{ el.name }}</text>
       </g>
     </g>
   </svg>
