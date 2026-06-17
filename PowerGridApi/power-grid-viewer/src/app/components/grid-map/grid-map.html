@@ -1,0 +1,85 @@
+<h2>Carte du réseau électrique</h2>
+<p class="hint">
+  Cliquez sur un élément du réseau pour le mettre en/hors service et observer la propagation de
+  l'alimentation.
+</p>
+
+<div class="map-wrapper">
+  <svg viewBox="0 0 900 540" preserveAspectRatio="xMidYMid meet" class="grid-svg">
+    <!-- Liaisons entre éléments du réseau -->
+    <g class="connections">
+      <line
+        *ngFor="let c of connectionViews()"
+        [attr.x1]="c.x1"
+        [attr.y1]="c.y1"
+        [attr.x2]="c.x2"
+        [attr.y2]="c.y2"
+        [class.live]="c.live"
+        class="connection"
+      />
+    </g>
+
+    <!-- Liaisons élément source -> zone alimentée -->
+    <g class="feeders">
+      <line
+        *ngFor="let f of zoneSourceLinks()"
+        [attr.x1]="f.x1"
+        [attr.y1]="f.y1"
+        [attr.x2]="f.x2"
+        [attr.y2]="f.y2"
+        [class.live]="f.live"
+        class="feeder"
+      />
+    </g>
+
+    <!-- Zones de la ville -->
+    <g class="zones">
+      <g *ngFor="let z of zoneViews()" [attr.transform]="'translate(' + z.x + ',' + z.y + ')'">
+        <rect
+          x="0"
+          y="-26"
+          width="160"
+          height="52"
+          rx="6"
+          class="zone"
+          [class.powered]="z.powered"
+        />
+        <text x="80" y="-6" text-anchor="middle" class="zone-name">{{ z.name }}</text>
+        <text x="80" y="12" text-anchor="middle" class="zone-category">{{ z.category }}</text>
+        <text x="148" y="-12" text-anchor="end" class="zone-status">
+          {{ z.powered ? '⚡' : '✕' }}
+        </text>
+      </g>
+    </g>
+
+    <!-- Éléments du réseau (cliquables) -->
+    <g class="elements">
+      <g
+        *ngFor="let el of elements()"
+        [attr.transform]="'translate(' + (el.x ?? 0) + ',' + (el.y ?? 0) + ')'"
+        class="element"
+        (click)="toggle(el)"
+      >
+        <rect
+          x="-46"
+          y="-22"
+          width="92"
+          height="44"
+          rx="8"
+          [attr.fill]="elementFill(el)"
+          class="element-box"
+        />
+        <text x="0" y="-3" text-anchor="middle" class="element-name">{{ el.name }}</text>
+        <text x="0" y="13" text-anchor="middle" class="element-type">{{ el.type }}</text>
+      </g>
+    </g>
+  </svg>
+
+  <div class="legend">
+    <span><i class="swatch energized"></i> Alimenté</span>
+    <span><i class="swatch unpowered"></i> Sous tension coupée</span>
+    <span><i class="swatch offline"></i> Hors service</span>
+    <span><i class="swatch zone-on"></i> Zone alimentée</span>
+    <span><i class="swatch zone-off"></i> Zone non alimentée</span>
+  </div>
+</div>

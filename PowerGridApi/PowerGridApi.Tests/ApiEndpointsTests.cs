@@ -64,8 +64,57 @@ public class ApiEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         Assert.Equal("Test-CI", created.Name);
         Assert.Equal("Charge", created.Type);
     }
+
+    [Fact]
+    public async Task GetTopology_ReturnsElementsConnectionsAndZones()
+    {
+        var topology = await _client.GetFromJsonAsync<TopologyDto>("/api/topology");
+
+        Assert.NotNull(topology);
+        Assert.NotEmpty(topology.Elements);
+        Assert.NotEmpty(topology.Connections);
+        Assert.NotEmpty(topology.Zones);
+        Assert.All(topology.Connections, c =>
+        {
+            Assert.Contains(topology.Elements, e => e.Id == c.FromId);
+            Assert.Contains(topology.Elements, e => e.Id == c.ToId);
+        });
+    }
+
+    [Fact]
+    public async Task UpdateStatus_ChangesElementStatus()
+    {
+        var response = await _client.PutAsJsonAsync("/api/elements/2/status", new { status = "Hors service" });
+
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var updated = await response.Content.ReadFromJsonAsync<GridElementDto>();
+        Assert.NotNull(updated);
+        Assert.Equal(2, updated.Id);
+        Assert.Equal("Hors service", updated.Status);
+
+        // Remettre l'élément en service pour ne pas affecter les autres tests.
+        await _client.PutAsJsonAsync("/api/elements/2/status", new { status = "En service" });
+    }
+
+    [Fact]
+    public async Task UpdateStatus_ReturnsNotFound_WhenMissing()
+    {
+        var response = await _client.PutAsJsonAsync("/api/elements/99999/status", new { status = "En service" });
+
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
 }
 
 file record GridElementDto(int Id, string Name, string Type, double TensionKv, string Status);
+
+file record ConnectionDto(int Id, int FromId, int ToId);
+
+file record ZoneDto(int Id, string Name, string Category, int X, int Y, int SourceElementId);
+
+file record TopologyDto(
+    List<GridElementDto> Elements,
+    List<ConnectionDto> Connections,
+    List<ZoneDto> Zones);
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>;
