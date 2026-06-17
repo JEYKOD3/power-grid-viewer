@@ -1,0 +1,27 @@
+.app-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1.5rem;
+  background: #1f2937;
+  color: #fff;
+}
+
+.app-header h1 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.app-header nav a {
+  color: #cbd5e1;
+  text-decoration: none;
+  margin-left: 1rem;
+}
+
+.app-header nav a:hover {
+  color: #fff;
+}
+
+.app-main {
+  padding: 1.5rem;
+}

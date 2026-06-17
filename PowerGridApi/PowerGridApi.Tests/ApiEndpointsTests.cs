@@ -20,7 +20,7 @@ public class ApiEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 
         Assert.NotNull(elements);
         Assert.True(elements.Count >= 4);
-        Assert.Contains(elements, e => e.Nom == "T-Nord");
+        Assert.Contains(elements, e => e.Name == "T-Nord");
     }
 
     [Fact]
@@ -30,7 +30,7 @@ public class ApiEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 
         Assert.NotNull(element);
         Assert.Equal(2, element.Id);
-        Assert.Equal("G-Centrale", element.Nom);
+        Assert.Equal("G-Centrale", element.Name);
     }
 
     [Fact]
@@ -47,7 +47,7 @@ public class ApiEndpointsTests : IClassFixture<CustomWebApplicationFactory>
         var payload = new
         {
             id = 0,
-            nom = "Test-CI",
+            name = "Test-CI",
             type = "Charge",
             tensionKv = 10.0,
             status = "En service",
@@ -61,11 +61,11 @@ public class ApiEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 
         Assert.NotNull(created);
         Assert.True(created.Id >= 5);
-        Assert.Equal("Test-CI", created.Nom);
+        Assert.Equal("Test-CI", created.Name);
         Assert.Equal("Charge", created.Type);
     }
 }
 
-file record GridElementDto(int Id, string Nom, string Type, double TensionKv, string Status);
+file record GridElementDto(int Id, string Name, string Type, double TensionKv, string Status);
 
 public class CustomWebApplicationFactory : WebApplicationFactory<Program>;

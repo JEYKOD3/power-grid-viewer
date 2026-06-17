@@ -33,3 +33,4 @@
 /Users/jey/Documents/Claude/Projects/Job Search/power-grid-viewer/PowerGridApi/bin/Debug/net10.0/power-grid-viewer/tsconfig.app.json
 /Users/jey/Documents/Claude/Projects/Job Search/power-grid-viewer/PowerGridApi/bin/Debug/net10.0/power-grid-viewer/tsconfig.json
 /Users/jey/Documents/Claude/Projects/Job Search/power-grid-viewer/PowerGridApi/bin/Debug/net10.0/power-grid-viewer/tsconfig.spec.json
+/Users/jey/Documents/Claude/Projects/Job Search/power-grid-viewer/PowerGridApi/bin/Debug/net10.0/power-grid-viewer/dist/power-grid-viewer/prerendered-routes.json
