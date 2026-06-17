@@ -1,0 +1,16 @@
+# .NET build output
+**/bin/
+**/obj/
+
+# .NET user/IDE files
+*.user
+.vs/
+
+# Angular / Node build output
+**/dist/
+**/node_modules/
+**/.angular/cache/
+
+# OS files
+.DS_Store
+Thumbs.db
