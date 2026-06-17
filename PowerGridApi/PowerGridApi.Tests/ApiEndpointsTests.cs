@@ -104,6 +104,28 @@ public class ApiEndpointsTests : IClassFixture<CustomWebApplicationFactory>
 
         Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
     }
+
+    [Fact]
+    public async Task PostConnection_CreatesLink_BetweenExistingElements()
+    {
+        var response = await _client.PostAsJsonAsync("/api/connections", new { fromId = 2, toId = 1 });
+
+        Assert.Equal(HttpStatusCode.Created, response.StatusCode);
+
+        var created = await response.Content.ReadFromJsonAsync<ConnectionDto>();
+        Assert.NotNull(created);
+        Assert.True(created.Id > 0);
+        Assert.Equal(2, created.FromId);
+        Assert.Equal(1, created.ToId);
+    }
+
+    [Fact]
+    public async Task PostConnection_ReturnsBadRequest_WhenElementMissing()
+    {
+        var response = await _client.PostAsJsonAsync("/api/connections", new { fromId = 2, toId = 99999 });
+
+        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
+    }
 }
 
 file record GridElementDto(int Id, string Name, string Type, double TensionKv, string Status);
