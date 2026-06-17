@@ -4,4 +4,6 @@ export interface GridElement {
   type: string;
   tensionKv: number;
   status: string;
+  x?: number;
+  y?: number;
 }
