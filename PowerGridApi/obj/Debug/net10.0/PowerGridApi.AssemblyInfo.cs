@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("PowerGridApi")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d0072d2286ed5dd32fe90cf175bc3effcd947c4d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+36fa6cadbbb85ef6753d8b5bf42517817c72794c")]
 [assembly: System.Reflection.AssemblyProductAttribute("PowerGridApi")]
 [assembly: System.Reflection.AssemblyTitleAttribute("PowerGridApi")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
