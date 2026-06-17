@@ -17,6 +17,9 @@ var elements = new List<GridElement>
     new(4, "DJ-Ligne12",   "Disjoncteur",     25.0, "Hors service"),
 };
 
+// Route racine: redirige vers l'API pour éviter une page vide.
+app.MapGet("/", () => Results.Redirect("/api/elements"));
+
 // Endpoint pour récupérer la liste des éléments.
 app.MapGet("/api/elements", () => elements);
 
@@ -38,6 +41,6 @@ app.MapPost("/api/elements", (GridElement el) =>
 app.Run();
 
 // Modèle de données pour les éléments du réseau électrique.
-record GridElement(int Id, string Nom, string Type, double TensionKv, string Status);
+record GridElement(int Id, string Name, string Type, double TensionKv, string Status);
 
 public partial class Program { }

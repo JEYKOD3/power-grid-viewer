@@ -7,7 +7,7 @@ import { GridElement } from '../models/grid-element';
   providedIn: 'root',
 })
 export class Grid {
-  private apiUrl = 'http://localhost:5000/api/elements';
+  private apiUrl = 'http://localhost:5050/api/elements';
 
   constructor(private http: HttpClient) {}
 
