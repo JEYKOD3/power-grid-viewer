@@ -6,7 +6,6 @@ import { GridElement } from '../models/grid-element';
 @Injectable({
   providedIn: 'root',
 })
-
 export class Grid {
   private apiUrl = 'http://localhost:5000/api/elements';
 

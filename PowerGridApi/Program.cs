@@ -39,3 +39,5 @@ app.Run();
 
 // Modèle de données pour les éléments du réseau électrique.
 record GridElement(int Id, string Nom, string Type, double TensionKv, string Status);
+
+public partial class Program { }
