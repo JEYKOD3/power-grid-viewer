@@ -1,8 +1,22 @@
 <h2>Carte du réseau électrique</h2>
-<p class="hint">
+<p class="hint" *ngIf="mode() === 'reseau'">
   Cliquez sur un élément du réseau pour le mettre en/hors service et observer la propagation de
   l'alimentation. Astuce: activez <strong>G-Secours</strong> pour réalimenter la Zone-Insulaire.
 </p>
+<p class="hint" *ngIf="mode() === 'criticite'">
+  Analyse de contingence <strong>N-1</strong>: chaque équipement est coloré selon le nombre de
+  clients perdus s'il tombe en panne. Survolez un élément pour le détail, le classement est
+  ci-dessous.
+</p>
+
+<div class="modes">
+  <button type="button" [class.active]="mode() === 'reseau'" (click)="setMode('reseau')">
+    Réseau
+  </button>
+  <button type="button" [class.active]="mode() === 'criticite'" (click)="setMode('criticite')">
+    Criticité (N-1)
+  </button>
+</div>
 
 <div class="map-wrapper">
   <svg viewBox="0 0 1160 770" preserveAspectRatio="xMidYMid meet" class="grid-svg">
@@ -49,7 +63,9 @@
           [class.powered]="z.powered"
         />
         <text x="62" y="-4" text-anchor="middle" class="zone-name">{{ z.name }}</text>
-        <text x="62" y="11" text-anchor="middle" class="zone-category">{{ z.category }}</text>
+        <text x="62" y="11" text-anchor="middle" class="zone-category">
+          {{ z.category }} · {{ z.customers }} clients
+        </text>
         <text x="114" y="-9" text-anchor="end" class="zone-status">
           {{ z.powered ? '⚡' : '✕' }}
         </text>
@@ -65,14 +81,18 @@
         [class.generator]="el.type === 'Générateur'"
         (click)="toggle(el)"
       >
-        <circle r="26" [attr.fill]="elementFill(el)" class="element-node generator-node" />
+        <title *ngIf="mode() === 'criticite' && criticalityOf(el.id) as c">
+          {{ el.name }} — si hors service: {{ c.customersLost }} clients, {{ c.loadLostMw }} MW,
+          {{ c.zonesLost }} zone(s)
+        </title>
+        <circle r="26" [attr.fill]="fillFor(el)" class="element-node generator-node" />
         <rect
           x="-42"
           y="-17"
           width="84"
           height="34"
           rx="8"
-          [attr.fill]="elementFill(el)"
+          [attr.fill]="fillFor(el)"
           class="element-box"
         />
         <text x="0" y="4" text-anchor="middle" class="element-name">{{ el.name }}</text>
@@ -80,11 +100,46 @@
     </g>
   </svg>
 
-  <div class="legend">
+  <div class="legend" *ngIf="mode() === 'reseau'">
     <span><i class="swatch energized"></i> Alimenté</span>
     <span><i class="swatch unpowered"></i> Sous tension coupée</span>
     <span><i class="swatch offline"></i> Hors service</span>
     <span><i class="swatch zone-on"></i> Zone alimentée</span>
     <span><i class="swatch zone-off"></i> Zone non alimentée</span>
   </div>
+
+  <div class="legend" *ngIf="mode() === 'criticite'">
+    <span><i class="swatch crit-low"></i> Impact faible</span>
+    <span><i class="swatch crit-high"></i> Impact élevé</span>
+    <span><i class="swatch offline"></i> Hors service</span>
+  </div>
+</div>
+
+<div class="ranking" *ngIf="mode() === 'criticite'">
+  <h3>Classement de criticité (N-1)</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Équipement</th>
+        <th>Type</th>
+        <th>Zones perdues</th>
+        <th>Clients perdus</th>
+        <th>Charge perdue (MW)</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of ranking(); let i = index">
+        <td>{{ i + 1 }}</td>
+        <td>{{ r.name }}</td>
+        <td>{{ r.type }}</td>
+        <td>{{ r.zonesLost }}</td>
+        <td>{{ r.customersLost }}</td>
+        <td>{{ r.loadLostMw | number: '1.0-1' }}</td>
+      </tr>
+      <tr *ngIf="ranking().length === 0">
+        <td colspan="6">Aucun impact: tous les équipements critiques sont déjà hors service.</td>
+      </tr>
+    </tbody>
+  </table>
 </div>

@@ -4,7 +4,13 @@ import { Grid } from '../../services/grid';
 import { GridElement } from '../../models/grid-element';
 import { Connection } from '../../models/connection';
 import { Zone } from '../../models/zone';
-import { IN_SERVICE, computeEnergized, isZonePowered } from './energization';
+import {
+  ContingencyResult,
+  IN_SERVICE,
+  computeContingencies,
+  computeEnergized,
+  isZonePowered,
+} from './energization';
 
 interface ConnectionView {
   id: number;
@@ -19,6 +25,13 @@ interface ZoneView extends Zone {
   powered: boolean;
 }
 
+interface RankedContingency extends ContingencyResult {
+  name: string;
+  type: string;
+}
+
+type MapMode = 'reseau' | 'criticite';
+
 @Component({
   selector: 'app-grid-map',
   standalone: true,
@@ -31,8 +44,34 @@ export class GridMap implements OnInit {
   connections = signal<Connection[]>([]);
   zones = signal<Zone[]>([]);
   saving = signal(false);
+  mode = signal<MapMode>('reseau');
 
   energized = computed(() => computeEnergized(this.elements(), this.connections()));
+
+  contingencies = computed(() =>
+    computeContingencies(this.elements(), this.connections(), this.zones()),
+  );
+
+  private contingencyById = computed(
+    () => new Map(this.contingencies().map((c) => [c.elementId, c])),
+  );
+
+  private maxCustomersLost = computed(() =>
+    this.contingencies().reduce((max, c) => Math.max(max, c.customersLost), 0),
+  );
+
+  // Classement des équipements les plus critiques (impact décroissant).
+  ranking = computed<RankedContingency[]>(() => {
+    const byId = new Map(this.elements().map((e) => [e.id, e]));
+    return this.contingencies()
+      .filter((c) => c.customersLost > 0 || c.zonesLost > 0)
+      .map((c) => ({
+        ...c,
+        name: byId.get(c.elementId)?.name ?? `#${c.elementId}`,
+        type: byId.get(c.elementId)?.type ?? '',
+      }))
+      .sort((a, b) => b.customersLost - a.customersLost || b.loadLostMw - a.loadLostMw);
+  });
 
   connectionViews = computed<ConnectionView[]>(() => {
     const byId = new Map(this.elements().map((e) => [e.id, e]));
@@ -95,9 +134,34 @@ export class GridMap implements OnInit {
     return el.status === IN_SERVICE;
   }
 
+  setMode(mode: MapMode) {
+    this.mode.set(mode);
+  }
+
+  // Couleur d'un élément selon le mode courant.
+  fillFor(el: GridElement): string {
+    return this.mode() === 'criticite' ? this.criticalityFill(el) : this.elementFill(el);
+  }
+
   elementFill(el: GridElement): string {
     if (!this.isInService(el)) return '#9ca3af';
     return this.isEnergized(el.id) ? '#16a34a' : '#f59e0b';
+  }
+
+  // Échelle de chaleur (jaune -> rouge) proportionnelle aux clients perdus.
+  criticalityFill(el: GridElement): string {
+    if (!this.isInService(el)) return '#cbd5e1';
+    const impact = this.contingencyById().get(el.id)?.customersLost ?? 0;
+    const max = this.maxCustomersLost();
+    if (impact === 0 || max === 0) return '#94a3b8';
+    const ratio = impact / max;
+    const hue = 48 - 48 * ratio; // 48 (ambre) -> 0 (rouge)
+    const light = 55 - 12 * ratio;
+    return `hsl(${hue}, 90%, ${light}%)`;
+  }
+
+  criticalityOf(id: number): ContingencyResult | undefined {
+    return this.contingencyById().get(id);
   }
 
   toggle(el: GridElement) {

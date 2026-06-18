@@ -3,6 +3,56 @@
   margin-bottom: 1rem;
 }
 
+/* Sélecteur de mode */
+.modes {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.modes button {
+  padding: 6px 14px;
+  border: 1px solid #cbd5e1;
+  background: #fff;
+  border-radius: 999px;
+  cursor: pointer;
+  font-size: 13px;
+  color: #334155;
+}
+
+.modes button.active {
+  background: #1f2937;
+  border-color: #1f2937;
+  color: #fff;
+}
+
+/* Classement de criticité */
+.ranking {
+  margin-top: 16px;
+}
+
+.ranking h3 {
+  margin: 0 0 8px;
+}
+
+.ranking table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.ranking th,
+.ranking td {
+  text-align: left;
+  padding: 6px 10px;
+  border-bottom: 1px solid #e5e7eb;
+}
+
+.ranking tbody tr:first-child {
+  font-weight: 600;
+  background: #fef2f2;
+}
+
 .map-wrapper {
   border: 1px solid #e2e8f0;
   border-radius: 10px;
@@ -16,29 +66,16 @@
   display: block;
 }
 
-/* Fond de carte */
-.map-bg {
-  fill: #eef5ee;
-}
-
-.map-halo {
-  fill: none;
-  stroke: #d6e6d6;
-  stroke-width: 2;
-  stroke-dasharray: 4 8;
-}
-
 /* Liaisons réseau */
 .connection,
 .feeder {
   stroke: #cbd5e1;
-  stroke-width: 2.5;
-  stroke-linecap: round;
+  stroke-width: 4;
 }
 
 .feeder {
-  stroke-dasharray: 5 6;
-  stroke-width: 2;
+  stroke-dasharray: 6 6;
+  stroke-width: 3;
 }
 
 .connection.live,
@@ -47,14 +84,14 @@
 }
 
 .connection.live {
-  stroke-width: 3.5;
+  stroke-width: 5;
 }
 
 /* Zones */
 .zone {
   fill: #fee2e2;
   stroke: #ef4444;
-  stroke-width: 1.5;
+  stroke-width: 2;
   transition:
     fill 0.2s ease,
     stroke 0.2s ease;
@@ -66,18 +103,18 @@
 }
 
 .zone-name {
-  font-size: 12px;
+  font-size: 13px;
   font-weight: 600;
   fill: #1f2937;
 }
 
 .zone-category {
-  font-size: 9px;
+  font-size: 10px;
   fill: #6b7280;
 }
 
 .zone-status {
-  font-size: 12px;
+  font-size: 13px;
 }
 
 /* Éléments */
@@ -95,30 +132,16 @@
   stroke-width: 3;
 }
 
-/* Générateurs: rond plutôt que rectangle */
-.generator-node {
-  display: none;
-  stroke: #1f2937;
-  stroke-width: 2;
-  transition: fill 0.2s ease;
-}
-
-.element.generator .generator-node {
-  display: block;
-}
-
-.element.generator .element-box {
-  display: none;
-}
-
-.element.generator:hover .generator-node {
-  stroke-width: 3.5;
-}
-
 .element-name {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   fill: #ffffff;
+  pointer-events: none;
+}
+
+.element-type {
+  font-size: 9px;
+  fill: #f1f5f9;
   pointer-events: none;
 }
 
@@ -166,4 +189,12 @@
 .swatch.zone-off {
   background: #fee2e2;
   border-color: #ef4444;
+}
+
+.swatch.crit-low {
+  background: hsl(48, 90%, 55%);
+}
+
+.swatch.crit-high {
+  background: hsl(0, 90%, 43%);
 }
