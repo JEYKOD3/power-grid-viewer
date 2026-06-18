@@ -75,20 +75,21 @@ var connections = new List<Connection>
 };
 
 // Zones de la ville alimentées par un élément du réseau.
+// LoadMw = charge appelée (MW), Customers = nombre de clients desservis.
 var zones = new List<Zone>
 {
-    new(1,  "Résidentiel-A",  "Résidentiel", 380,  55, 4),
-    new(2,  "Écoles",         "Public",      520,  50, 4),
-    new(3,  "Hôpital",        "Critique",    700,  55, 13),
-    new(4,  "Centre-Ville",   "Commercial",  780, 540, 3),
-    new(5,  "Industriel",     "Industriel",  270, 690, 6),
-    new(6,  "Entrepôts",      "Industriel",  430, 700, 6),
-    new(7,  "Commercial-Est", "Commercial",  820, 710, 15),
-    new(8,  "Quartier-Est",   "Résidentiel", 1000, 220, 8),
-    new(9,  "Parc-Techno",    "Industriel",  1010, 420, 9),
-    new(10, "Résidentiel-O",  "Résidentiel",  50, 220, 11),
-    new(11, "Université",     "Public",        40, 410, 12),
-    new(12, "Zone-Insulaire", "Résidentiel",   50, 700, 17),
+    new(1,  "Résidentiel-A",  "Résidentiel", 380,  55, 4,  4.5, 1200),
+    new(2,  "Écoles",         "Public",      520,  50, 4,  1.5,    6),
+    new(3,  "Hôpital",        "Critique",    700,  55, 13, 3.0,    3),
+    new(4,  "Centre-Ville",   "Commercial",  780, 540, 3,  6.0,  900),
+    new(5,  "Industriel",     "Industriel",  270, 690, 6,  8.0,   40),
+    new(6,  "Entrepôts",      "Industriel",  430, 700, 6,  5.0,   25),
+    new(7,  "Commercial-Est", "Commercial",  820, 710, 15, 4.0,  300),
+    new(8,  "Quartier-Est",   "Résidentiel", 1000, 220, 8,  5.0, 1500),
+    new(9,  "Parc-Techno",    "Industriel",  1010, 420, 9,  6.5,   60),
+    new(10, "Résidentiel-O",  "Résidentiel",  50, 220, 11, 3.5,  950),
+    new(11, "Université",     "Public",        40, 410, 12, 4.0,   30),
+    new(12, "Zone-Insulaire", "Résidentiel",   50, 700, 17, 1.2,  250),
 };
 
 // Route racine: redirige vers l'API pour éviter une page vide.
@@ -149,7 +150,7 @@ record GridElement(int Id, string Name, string Type, double TensionKv, string St
 record Connection(int Id, int FromId, int ToId);
 
 // Zone de la ville alimentée par un élément du réseau.
-record Zone(int Id, string Name, string Category, int X, int Y, int SourceElementId);
+record Zone(int Id, string Name, string Category, int X, int Y, int SourceElementId, double LoadMw = 0, int Customers = 0);
 
 // Corps de requête pour la mise à jour du statut.
 record StatusUpdate(string Status);

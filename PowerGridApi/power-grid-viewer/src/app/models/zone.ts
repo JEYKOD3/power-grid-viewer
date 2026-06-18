@@ -5,4 +5,6 @@ export interface Zone {
   x: number;
   y: number;
   sourceElementId: number;
+  loadMw: number;
+  customers: number;
 }

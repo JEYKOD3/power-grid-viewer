@@ -52,3 +52,51 @@ export function computeEnergized(elements: GridElement[], connections: Connectio
 export function isZonePowered(zone: Zone, energized: Set<number>): boolean {
   return energized.has(zone.sourceElementId);
 }
+
+export interface ContingencyResult {
+  elementId: number;
+  zonesLost: number;
+  customersLost: number;
+  loadLostMw: number;
+}
+
+/**
+ * Analyse de contingence N-1: pour chaque élément actuellement en service, simule
+ * sa mise hors service et mesure l'impact (zones, clients et charge perdus par
+ * rapport à l'état courant). Permet de classer les équipements par criticité.
+ */
+export function computeContingencies(
+  elements: GridElement[],
+  connections: Connection[],
+  zones: Zone[],
+): ContingencyResult[] {
+  const baseEnergized = computeEnergized(elements, connections);
+  const basePoweredZoneIds = new Set(
+    zones.filter((z) => baseEnergized.has(z.sourceElementId)).map((z) => z.id),
+  );
+
+  const results: ContingencyResult[] = [];
+
+  for (const el of elements) {
+    if (el.status !== IN_SERVICE) continue;
+
+    const modified = elements.map((e) => (e.id === el.id ? { ...e, status: 'Hors service' } : e));
+    const afterEnergized = computeEnergized(modified, connections);
+
+    let zonesLost = 0;
+    let customersLost = 0;
+    let loadLostMw = 0;
+
+    for (const z of zones) {
+      if (basePoweredZoneIds.has(z.id) && !afterEnergized.has(z.sourceElementId)) {
+        zonesLost++;
+        customersLost += z.customers;
+        loadLostMw += z.loadMw;
+      }
+    }
+
+    results.push({ elementId: el.id, zonesLost, customersLost, loadLostMw });
+  }
+
+  return results;
+}
